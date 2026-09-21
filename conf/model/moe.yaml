@@ -1,0 +1,8 @@
+dim: 64
+hidden: 96
+dropout: 0.3
+hops: 3
+num_communities: 16
+
+conv: graphconv
+aggr: add        

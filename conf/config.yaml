@@ -1,62 +1,29 @@
-hydra:
-  mode: RUN
-  sweeper:
-    params:
-      data.graph_type: reply,retweet,mention,late_fuse
-      model.encoder: cosine,mlp,gcn,gat,gatv2,gine,sage,transformer,nnconv
-  run:
-    dir: outputs/singlerun/${now:%Y-%m-%d}_${now:%H-%M-%S}
-  sweep:
-    dir: outputs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
-    subdir: ${hydra.job.num}
-
-data:
-  # Base directory for all extraction runs
-  base_dir: ../GraphAnalysis/resources
-  # Specific extraction run ID
-  run_id: 8cd290e451f511f182c408f1eaf4fe18
-  
-  # Combined path used by the pipeline
-  data_dir: ${data.base_dir}/${data.run_id}
-  load_graph_if_exists: true
-  graph_type: retweet
-  split: [0.70, 0.15, 0.15]
-  allow_self_loops: false
-  max_communities: 100
-
-model:
-  encoder: gat
-  decoder: mlp
-  num_epochs: 50
-  learning_rate: 0.0005
-  weight_decay: 1e-5
-  hidden_dim: 64
-  embed_dim: 32
-  dropout: 0.1
-  neg_ratio: 100.0
-  decoder_hidden: 32
-  decoder_dropout: 0.1
-  scheduler: false
-  grad_clip: 0.0
-  early_stopping_patience: 20
-  seed: 777
-  fusion: concat
-  batch_size: 512
-  num_neighbors: [10, 5]
-
-evaluation:
-  neg_ratios: [1, 9, 100]
-
-output:
-  base_dir: outputs
-  output_dir: ${output.base_dir}/models
-  log_dir: ${output.base_dir}/logs
-  graph_dir: ${output.base_dir}/graphs/${data.run_id}
-  # Fallback to local SQLite if MLFLOW_TRACKING_URI is not set (overridden by env var in main.py)
-  mlflow_tracking_uri: ${oc.env:MLFLOW_TRACKING_URI, "http://127.0.0.1:5050"}
-  experiment_name: ${oc.env:MLFLOW_EXPERIMENT_NAME, "gnn-link-prediction-v2"}
-
-
 defaults:
-  - config_schema
+  - model: moe
+  - training: default
+  - mlflow: default
   - _self_
+
+seed: 42
+
+paths:
+  dati: /ipazianas/pasquini/output_graph_analysis/feb-oct_hour_2022/60d486e0adcc11f1a4ef08f1eaf4fe18/features_extraction/edge_index/dati_orari.pt
+  output_root: /ipazianas/pasquini/bernardi/MOE/result
+  checkpoint_dir: /ipazianas/pasquini/bernardi/MOE/checkpoint
+  hydra_giorno: ${paths.output_root}/hydra/${now:%Y-%m-%d}
+  run_dir: ${paths.hydra_giorno}/${indice_run:${paths.hydra_giorno}}
+
+  log_file: ${paths.run_dir}/run.log
+  assegnazioni: ${paths.run_dir}/test_per_grafo.csv
+  storico: ${paths.run_dir}/storico.csv
+  leiden: ${paths.run_dir}/leiden_per_grafo.csv
+  louvain: ${paths.run_dir}/louvain_per_grafo.csv
+
+hydra:
+  run:
+    dir: ${paths.run_dir}
+  sweep:
+    dir: ${paths.hydra_giorno}/multirun/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  job:
+    chdir: false    

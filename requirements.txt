@@ -1,18 +1,15 @@
-python-dotenv
-mlflow
-scikit-learn
+torch>=2.0
+torch-geometric>=2.4
+numpy>=1.24
+pyyaml>=6.0
+
+# config
+hydra-core>=1.3
+omegaconf>=2.3
+
+# tracciamento degli esperimenti
+mlflow>=2.14
+
+# baseline Louvain (louvain.py)
+python-igraph
 pandas
-numpy
-# install this before requirements.txt to ensure the installation order
-torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
-# install this before requirements.txt to ensure the installation order
-torch-scatter==2.1.2 --find-links https://data.pyg.org/whl/torch-2.6.0+cu124.html
-torch-sparse==0.6.18 --find-links https://data.pyg.org/whl/torch-2.6.0+cu124.html
-torch-cluster==1.6.3 --find-links https://data.pyg.org/whl/torch-2.6.0+cu124.html
-torch-geometric
-hydra-core
-omegaconf
-hydra-joblib-launcher
-mmh3
-pymongo
-python-dateutil
